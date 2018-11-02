@@ -30,7 +30,10 @@ public struct KeychainSwiftConstants {
   
   /// Used for specifying a value when setting a Keychain value.
   public static var valueData: String { return toString(kSecValueData) }
-  
+
+  /// Used for specifying a prompt message when getting a keychain items.
+  public static var useOperationPrompt: String { return toString(kSecUseOperationPrompt) }
+
   static func toString(_ value: CFString) -> String {
     return value as String
   }

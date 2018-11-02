@@ -132,11 +132,12 @@ open class KeychainSwift {
   Retrieves the text value from the keychain that corresponds to the given key.
   
   - parameter key: The key that is used to read the keychain item.
+  - parameter promptMessage: Message system will show to the user.
   - returns: The text value from the keychain. Returns nil if unable to read the item.
   
   */
-  open func get(_ key: String) -> String? {
-    if let data = getData(key) {
+  open func get(_ key: String, promptMessage: String?) -> String? {
+    if let data = getData(key, promptMessage: promptMessage) {
       
       if let currentString = String(data: data, encoding: .utf8) {
         return currentString
@@ -153,10 +154,11 @@ open class KeychainSwift {
   Retrieves the data from the keychain that corresponds to the given key.
   
   - parameter key: The key that is used to read the keychain item.
+  - parameter promptMessage: Message system will show to the user.
   - returns: The text value from the keychain. Returns nil if unable to read the item.
   
   */
-  open func getData(_ key: String) -> Data? {
+  open func getData(_ key: String, promptMessage: String?) -> Data? {
     // The lock prevents the code to be run simlultaneously
     // from multiple threads which may result in crashing
     readLock.lock()
@@ -173,6 +175,7 @@ open class KeychainSwift {
     
     query = addAccessGroupWhenPresent(query)
     query = addSynchronizableIfRequired(query, addingItems: false)
+    query = addPromptMessage(query, promptMessage: promptMessage)
     lastQueryParameters = query
     
     var result: AnyObject?
@@ -191,11 +194,12 @@ open class KeychainSwift {
   Retrieves the boolean value from the keychain that corresponds to the given key.
 
   - parameter key: The key that is used to read the keychain item.
+  - parameter promptMessage: Message system will show to the user.
   - returns: The boolean value from the keychain. Returns nil if unable to read the item.
 
   */
-  open func getBool(_ key: String) -> Bool? {
-    guard let data = getData(key) else { return nil }
+  open func getBool(_ key: String, promptMessage: String?) -> Bool? {
+    guard let data = getData(key, promptMessage: promptMessage) else { return nil }
     guard let firstBit = data.first else { return nil }
     return firstBit == 1
   }
@@ -274,4 +278,23 @@ open class KeychainSwift {
     result[KeychainSwiftConstants.attrSynchronizable] = addingItems == true ? true : kSecAttrSynchronizableAny
     return result
   }
+
+
+  /**
+
+  Adds kSecUseOperationPrompt: String item to the dictionary if prompt message was provided.
+
+  - parameter items: The dictionary where the kSecUseOperationPrompt item will be added when requested.
+  - parameter promptMessage: Message system will show to the user.
+
+  - returns: the dictionary with kSecUseOperationPrompt item added if prompt message was provided.
+
+   */
+  func addPromptMessage(_ items: [String: Any], promptMessage: String? = nil) -> [String: Any] {
+    guard let promptMessage = promptMessage else { return items }
+    var result: [String: Any] = items
+    result[KeychainSwiftConstants.useOperationPrompt] = promptMessage
+    return result
+  }
+
 }
