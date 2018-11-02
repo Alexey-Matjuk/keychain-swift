@@ -136,7 +136,7 @@ open class KeychainSwift {
   - returns: The text value from the keychain. Returns nil if unable to read the item.
   
   */
-  open func get(_ key: String, promptMessage: String?) -> String? {
+  open func get(_ key: String, promptMessage: String? = nil) -> String? {
     if let data = getData(key, promptMessage: promptMessage) {
       
       if let currentString = String(data: data, encoding: .utf8) {
@@ -158,7 +158,7 @@ open class KeychainSwift {
   - returns: The text value from the keychain. Returns nil if unable to read the item.
   
   */
-  open func getData(_ key: String, promptMessage: String?) -> Data? {
+  open func getData(_ key: String, promptMessage: String? = nil) -> Data? {
     // The lock prevents the code to be run simlultaneously
     // from multiple threads which may result in crashing
     readLock.lock()
@@ -198,7 +198,7 @@ open class KeychainSwift {
   - returns: The boolean value from the keychain. Returns nil if unable to read the item.
 
   */
-  open func getBool(_ key: String, promptMessage: String?) -> Bool? {
+  open func getBool(_ key: String, promptMessage: String? = nil) -> Bool? {
     guard let data = getData(key, promptMessage: promptMessage) else { return nil }
     guard let firstBit = data.first else { return nil }
     return firstBit == 1
